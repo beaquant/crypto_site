@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strings"
 
 	"encoding/json"
 
@@ -30,23 +31,39 @@ var profitFunc = map[string]func(hashRate, period float64) float64{
 
 var gpuHashrates map[string]map[string]float64
 var sessDB *tntsessions.SessionsBase
+var sessions map[string]*tntsessions.Session
 
 func updateProfitRoutine() {
 	time.Sleep(5 * time.Minute)
 }
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
+	var sess *tntsessions.Session
+	var err error
+
+	language := "en"
+	acceptLanguages := strings.Split(string(ctx.Request.Header.Peek("Accept-Language")), ";")
+	if len(acceptLanguages) > 0 {
+		acceptLanguage := strings.Split(acceptLanguages[0], ",")
+		if len(acceptLanguage) > 1 {
+			language = acceptLanguage[1]
+		}
+	}
+
 	if len(ctx.Request.Header.Cookie("session_id")) == 0 {
-		_, err := sessDB.Create(3 * 24 * 60 * 60)
+		sess, err = sessDB.Create(3 * 24 * 60 * 60)
 		if err != nil {
 			log.Printf("Err on creating session: %v\n", err)
 			ctx.Response.SetStatusCode(int(InternalServerError))
 			return
 		}
 
-		// c.SetKey("session_id")
-		// c.SetValue(session.SessionID)
-		// ctx.Response.Header.SetCookie(&c)
+		sess.Data["language"] = language
+		sessions[sess.ID] = sess
+		c := fasthttp.Cookie{}
+		c.SetKey("session_id")
+		c.SetValue(sess.ID)
+		ctx.Response.Header.SetCookie(&c)
 	}
 
 	path := string(ctx.Path())
@@ -89,6 +106,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Err on connecting to sessions db: %v\n", err)
 	}
+
+	sessions = make(map[string]*tntsessions.Session)
 
 	err = fasthttp.ListenAndServe("0.0.0.0:8080", requestHandler)
 

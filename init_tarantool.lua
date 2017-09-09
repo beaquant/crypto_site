@@ -1,7 +1,7 @@
 box.cfg{listen="127.0.0.1:3309", work_dir='./sessions', log_level=5, log='./tarantool.log'}
 log = require('log')
 
-memtx = true
+memtx = false
 
 if box.space.sessions == nil then
     if memtx then
