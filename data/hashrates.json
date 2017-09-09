@@ -1,0 +1,123 @@
+{
+    
+    "GeForce GTX 1080 Ti": {
+        "ethereum": 31300000,
+        "zcash": 680,
+        "bitcoin": 0
+    },
+
+    
+    "Nvidia Titan XP": {
+        "ethereum": 30800000,
+        "zcash": 810,
+        "bitcoin": 0
+    },
+
+    
+    "Radeon R9 390X": {
+        "ethereum": 28300000,
+        "zcash": 330,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon R9 390": {
+        "ethereum": 28100000 ,
+        "zcash": 258,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon R9 Fury X": {
+        "ethereum": 26100000,
+        "zcash":    480,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon R9 Fury": {
+        "ethereum": 26000000,
+        "zcash": 490,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon R9 Nano": {
+        "ethereum": 25800000,
+        "zcash": 450,
+        "bitcoin": 0 
+    },
+
+ 
+    "GeForce GTX 1070": {
+        "ethereum": 25600000,
+        "zcash": 425,
+        "bitcoin": 0
+    },
+
+    "GeForce GTX 1080": {
+        "ethereum": 21900000,
+        "zcash": 620,
+        "bitcoin": 0
+    },
+
+ 
+    "GeForce GTX 1060": {
+        "ethereum": 19000000,
+        "zcash": 300,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon R9 380X": {
+        "ethereum": 17000000,
+        "zcash": 0,
+        "bitcoin": 0
+    },
+
+    "Radeon RX 580": {
+        "ethereum": 16800000,
+        "zcash": 0,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon R9 380": {
+        "ethereum": 16800000,
+        "zcash": 0,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon RX 570": {
+        "ethereum": 16200000 ,
+        "zcash": 0,
+        "bitcoin": 0
+    },
+
+    "Radeon RX 470": {
+        "ethereum": 16000000,
+        "zcash": 290,
+        "bitcoin": 0
+    },
+
+ 
+    "GeForce GTX 1050 Ti": {
+        "ethereum": 11700000,
+        "zcash": 150,
+        "bitcoin": 0
+    },
+
+    "Radeon RX 560": {
+        "ethereum": 8700000,
+        "zcash": 0,
+        "bitcoin": 0
+    },
+
+ 
+    "Radeon RX 460": {
+        "ethereum": 8400000,
+        "zcash": 0,
+        "bitcoin": 0
+    }
+}
