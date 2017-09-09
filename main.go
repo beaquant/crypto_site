@@ -9,7 +9,17 @@ import (
 
 	"io/ioutil"
 
+	"github.com/muller95/tntsessions"
 	"github.com/valyala/fasthttp"
+)
+
+type RestCode uint32
+
+const (
+	Ok                  RestCode = 200
+	NotFound            RestCode = 404
+	SessionExpired      RestCode = 471
+	InternalServerError RestCode = 500
 )
 
 var profitFunc = map[string]func(hashRate, period float64) float64{
@@ -19,12 +29,26 @@ var profitFunc = map[string]func(hashRate, period float64) float64{
 }
 
 var gpuHashrates map[string]map[string]float64
+var sessDB *tntsessions.SessionsBase
 
 func updateProfitRoutine() {
 	time.Sleep(5 * time.Minute)
 }
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
+	if len(ctx.Request.Header.Cookie("session_id")) == 0 {
+		_, err := sessDB.Create(3 * 24 * 60 * 60)
+		if err != nil {
+			log.Printf("Err on creating session: %v\n", err)
+			ctx.Response.SetStatusCode(int(InternalServerError))
+			return
+		}
+
+		// c.SetKey("session_id")
+		// c.SetValue(session.SessionID)
+		// ctx.Response.Header.SetCookie(&c)
+	}
+
 	path := string(ctx.Path())
 	switch path {
 	case "/":
@@ -51,6 +75,8 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 func main() {
+	var err error
+
 	getEthereumStats()
 	getZCashStats()
 	getBitcoinStats()
@@ -59,7 +85,13 @@ func main() {
 	bytes, _ := ioutil.ReadFile("data/hashrates.json")
 	json.Unmarshal(bytes, &gpuHashrates)
 
-	err := fasthttp.ListenAndServe("0.0.0.0:8080", requestHandler)
+	sessDB, err = tntsessions.ConnectToTarantool("127.0.0.1:3309", "guest", "", "sessions")
+	if err != nil {
+		log.Fatalf("Err on connecting to sessions db: %v\n", err)
+	}
+
+	err = fasthttp.ListenAndServe("0.0.0.0:8080", requestHandler)
+
 	// err = fasthttp.ListenAndServeTLS(":"+serverPort, certificatePath, keyPath,
 	// requestHandler)
 	if err != nil {
