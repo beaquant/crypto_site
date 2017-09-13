@@ -119,6 +119,8 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 
 		profitJSON, _ := json.Marshal(profitMap)
 		ctx.Write(profitJSON)
+	case "/set_language":
+		setLanguage(ctx, sess)
 	default:
 		fasthttp.FSHandler("public/", 0)(ctx)
 	}

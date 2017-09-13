@@ -18,6 +18,7 @@ type MainPage struct {
 	PerMonth        string
 	PerYear         string
 	Calculate       string
+	Language        string
 }
 
 func mainPage(ctx *fasthttp.RequestCtx, sess *tntsessions.Session) {
@@ -36,6 +37,8 @@ func mainPage(ctx *fasthttp.RequestCtx, sess *tntsessions.Session) {
 		ctx.Response.SetStatusCode(int(InternalServerError))
 		return
 	}
+
+	mainPage.Language = sess.GetString("language")
 
 	template, err := template.ParseFiles("public/pages/main.html")
 	if err != nil {
