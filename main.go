@@ -32,13 +32,34 @@ var profitFunc = map[string]func(hashRate, period float64) float64{
 var gpuHashrates map[string]map[string]float64
 var sessDB *tntsessions.SessionsBase
 var sessions map[string]*tntsessions.Session
+var commitTime = 5
+var updateProfit = 60
 
 func updateProfitRoutine() {
-	time.Sleep(5 * time.Minute)
+	time.Sleep(time.Duration(updateProfit) * time.Minute)
+	getEthereumStats()
+	getZCashStats()
+	getBitcoinStats()
+}
+
+func commitSessionsRoutine() {
+	time.Sleep(time.Duration(commitTime) * time.Minute)
+	for _, sess := range sessions {
+		if sess.EndTime > time.Now().Unix() {
+			delete(sessions, sess.ID)
+			err := sessDB.Delete(sess.ID)
+			if err != nil {
+				log.Printf("Err deleting session %v: %v\n", sess, err)
+			}
+		}
+		err := sessDB.Put(sess)
+		if err != nil {
+			log.Printf("Err putting session %v: %v\n", sess, err)
+		}
+	}
 }
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
-	var sess *tntsessions.Session
 	var err error
 
 	language := "en"
@@ -46,11 +67,22 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	if len(acceptLanguages) > 0 {
 		acceptLanguage := strings.Split(acceptLanguages[0], ",")
 		if len(acceptLanguage) > 1 {
-			language = acceptLanguage[1]
+			if acceptLanguage[1] == "ru" {
+				language = acceptLanguage[1]
+			}
 		}
 	}
 
-	if len(ctx.Request.Header.Cookie("session_id")) == 0 {
+	sessID := string(ctx.Request.Header.Cookie("session_id"))
+	sess, ok := sessions[sessID]
+	if !ok {
+		sess, err = sessDB.Get(sessID)
+	}
+
+	if err != nil && err != tntsessions.ErrNotFound {
+		log.Printf("Err on getting session %v: %v\n", sessID, err)
+		ctx.Response.SetStatusCode(int(InternalServerError))
+	} else if err == tntsessions.ErrNotFound {
 		sess, err = sessDB.Create(3 * 24 * 60 * 60)
 		if err != nil {
 			log.Printf("Err on creating session: %v\n", err)
@@ -58,7 +90,8 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 			return
 		}
 
-		sess.Data["language"] = language
+		sessions[sess.ID] = sess
+		sess.Set("language", language)
 		sessions[sess.ID] = sess
 		c := fasthttp.Cookie{}
 		c.SetKey("session_id")
@@ -69,7 +102,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	path := string(ctx.Path())
 	switch path {
 	case "/":
-		mainPage(ctx)
+		mainPage(ctx, sess)
 	case "/bitcoin_profit", "/ethereum_profit", "/zcash_profit":
 		hashrate := ctx.QueryArgs().GetUfloatOrZero("hashrate")
 		perDay := profitFunc[path](hashrate, 24*60*60)

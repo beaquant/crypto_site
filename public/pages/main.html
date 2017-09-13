@@ -3,7 +3,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Calculator</title>
+        <title>{{.Title}}</title>
         <link rel="stylesheet" type="text/css" href="/styles/bootstrap/css/bootstrap.min.css">
         <script src="/scripts/jquery-3.2.1.min.js"></script>
         <script src="/styles/bootstrap/js/bootstrap.min.js"></script>
@@ -11,17 +11,9 @@
             $(document).ready(function() {
                 
                 $("#calculate").click(function() {
-                    $("td[id^=bitcoin-]").text("0");
-                    $.get("bitcoin_profit", {hashrate: $("#hashrate").val()}, function(resp) {
-                        obj = $.parseJSON(resp)
-                        $("td[id=bitcoin-day]").text(obj.per_day);
-                        $("td[id=bitcoin-week]").text(obj.per_week);
-                        $("td[id=bitcoin-month]").text(obj.per_month);
-                        $("td[id=bitcoin-year]").text(obj.per_year);
-                    });
 
                     $("td[id^=ethereum-]").text("0");
-                    $.get("ethereum_profit", {hashrate: $("#hashrate").val()}, function(resp) {
+                    $.get("ethereum_profit", {hashrate: $("#hashrate-ethereum").val()}, function(resp) {
                         obj = $.parseJSON(resp)
                         $("td[id=ethereum-day]").text(obj.per_day);
                         $("td[id=ethereum-week]").text(obj.per_week);
@@ -30,7 +22,7 @@
                     });
 
                     $("td[id^=zcash-]").text("0");
-                    $.get("zcash_profit", {hashrate: $("#hashrate").val()}, function(resp) {
+                    $.get("zcash_profit", {hashrate: $("#hashrate-zcash").val()}, function(resp) {
                         obj = $.parseJSON(resp)
                         $("td[id=zcash-day]").text(obj.per_day);
                         $("td[id=zcash-week]").text(obj.per_week);
@@ -46,40 +38,35 @@
         <div class="container" style="margin-top:3%">
             <div class="card text-center">
                 <div class="card-header">
-                    <h4>Expected proffit calculator</h4>
+                    <h4>{{.CalculatorTitle}}</h4>
                 </div>
                 <div class="card-block" style="margin:1%">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Bitcoin</th>
                                 <th>Ethereum</th>
                                 <th>ZCash</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <th scope="row">Per day</th>
-                                <td id="bitcoin-day">0</td>
+                                <th scope="row">{{.PerDay}}</th>
                                 <td id="ethereum-day">0</td>
                                 <td id="zcash-day">0</td>
                             </tr>
                             <tr>
-                                <th scope="row">Per week</th>
-                                <td id="bitcoin-week">0</td>
+                                <th scope="row">{{.PerWeek}}</th>
                                 <td id="ethereum-week">0</td>
                                 <td id="zcash-week">0</td>
                             </tr>
                             <tr>
-                                <th scope="row">Per month</th>
-                                <td id="bitcoin-month">0</td>
+                                <th scope="row">{{.PerMonth}}</th>
                                 <td id="ethereum-month">0</td>
                                 <td id="zcash-month">0</td>
                             </tr>
                             <tr>
-                                <th scope="row">Per year</th>
-                                <td id="bitcoin-year">0</td>
+                                <th scope="row">{{.PerYear}}</th>
                                 <td id="ethereum-year">0</td>
                                 <td id="zcash-year">0</td>
                             </tr>
@@ -88,17 +75,13 @@
                     <form class="form-inline">
                         <div class="row">
                             <div class="col-12" >
-                                <input type="text" id="hashrate" class="form-control" placeholder="Hashrate H/s"/>
-                                <button id="calculate" type="button" class="btn btn-primary">Calculate</button>
+                                <input type="text" id="hashrate-ethereum" class="form-control" placeholder="Hashrate ethereum H/s"/>
+                                <input type="text" id="hashrate-zcash" class="form-control" placeholder="Hashrate zcash H/s"/>
+                                <button id="calculate" type="button" class="btn btn-primary">{{.Calculate}}</button>
                                 <div class="dropdown" style="display: inline-block">
                                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Dropdown button
                                     </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#">Action</a>
-                                        <a class="dropdown-item" href="#">Another action</a>
-                                        <a class="dropdown-item" href="#">Something else here</a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
