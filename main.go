@@ -129,6 +129,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 func main() {
 	var err error
 
+	extrapolateEthereumStats()
 	getEthereumStats()
 	getZCashStats()
 	getBitcoinStats()
