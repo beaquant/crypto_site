@@ -8,6 +8,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
+
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, look_back=1):
 	dataX, dataY = [], []
@@ -18,12 +19,12 @@ def create_dataset(dataset, look_back=1):
 	return numpy.array(dataX), numpy.array(dataY)
 
 def create_production_dataset(dataset, look_back=1):
-	dataX, dataY = [], []
-	for i in range(len(dataset)):
+	dataX = []
+	for i in range(len(dataset) - look_back + 1):
 		a = dataset[i:(i+look_back), 0]
 		dataX.append(a)
-		dataY.append(dataset[i + look_back, 0])
-	return numpy.array(dataX), numpy.array(dataY)
+	return numpy.array(dataX)
+
 # fix random seed for reproducibility
 numpy.random.seed(7)
 # load the dataset
@@ -78,26 +79,34 @@ trainPredictPlot[look_back:len(trainPredict)+look_back, :] = trainPredict'''
 testPredictPlot[:, :] = numpy.nan
 testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredict'''
 # shift whole predictions for plotting
-wholePredictPlot = numpy.empty_like(dataset)
+'''wholePredictPlot = numpy.empty_like(dataset)
 wholePredictPlot[:, :] = numpy.nan
-wholePredictPlot[look_back:len(dataset), :] = wholePredict
+wholePredictPlot[look_back:len(dataset), :] = wholePredict'''
 
 # print(testPredict)
 # print('dataset')
 # print(dataset)
 # print(testX)
 outset = dataset[:]
-for i in range(0, 1):
-	input,_ = create_production_dataset(outset[-look_back:], look_back)
-	print(input)
+for i in range(0, 365):
+	# print(dataset)
+	input = create_production_dataset(dataset[-look_back:], look_back)
+	# print(input)
 	input = numpy.reshape(input, (input.shape[0], 1, input.shape[1]))
 	prediction = model.predict(input)
-	print(prediction)
+	# print(prediction)
+	dataset = numpy.concatenate((dataset,  prediction))
 
 
 # plot baseline and predictions
-plt.plot(scaler.inverse_transform(dataset))
+# plt.plot(scaler.inverse_transform(dataset))
 # plt.plot(trainPredictPlot)
 # plt.plot(testPredictPlot)
-plt.plot(wholePredictPlot)
-plt.show()
+# plt.plot(wholePredictPlot)
+coefs = dataset[-365:, 0]
+f = open("data/coefficients.dat" , "w")
+print(dataset[-365:, 0])
+for i in range (0, 365):
+	print(str(coefs[i]))
+	f.writelines(str(coefs[i]) + "\n")
+# plt.show()
