@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -23,6 +24,8 @@ const (
 	InternalServerError RestCode = 500
 )
 
+var ethereumReward = 5.0
+
 var profitFunc = map[string]func(hashRate, period float64) float64{
 	"/bitcoin_profit":  calculateBitcoinProfit,
 	"/ethereum_profit": calculateEthereumProfit,
@@ -34,6 +37,7 @@ var sessDB *tntsessions.SessionsBase
 var sessions map[string]*tntsessions.Session
 var commitTime = 5
 var updateProfit = 60
+var ethereumCoefficients []float64
 
 func updateProfitRoutine() {
 	time.Sleep(time.Duration(updateProfit) * time.Minute)
@@ -119,6 +123,21 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 
 		profitJSON, _ := json.Marshal(profitMap)
 		ctx.Write(profitJSON)
+	case "/ethereum_prediction":
+		// return hashRate / networkHashRate * period / avgBlockTime * reward
+
+		// hashrate := ctx.QueryArgs().GetUfloatOrZero("hashrate")
+		profit := make([]float64, len(ethereumCoefficients))
+		for i := 0; i < len(ethereumCoefficients); i++ {
+			profit[i] = ethereumCoefficients[i] / ethereumNetworkMultiplier
+			/*if i > 0 {
+				profit[i] += profit[i-1]
+			}*/
+		}
+
+		profitJSON, _ := json.Marshal(profit)
+		ctx.Response.SetStatusCode(int(Ok))
+		ctx.Write(profitJSON)
 	case "/set_language":
 		setLanguage(ctx, sess)
 	default:
@@ -145,6 +164,7 @@ func main() {
 
 	sessions = make(map[string]*tntsessions.Session)
 
+	fmt.Println("Server is ready")
 	err = fasthttp.ListenAndServe("0.0.0.0:8080", requestHandler)
 
 	// err = fasthttp.ListenAndServeTLS(":"+serverPort, certificatePath, keyPath,

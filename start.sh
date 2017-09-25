@@ -2,6 +2,7 @@
 
 mkdir logs
 mkdir sessions
+mkdir data
 
 tarantool init_tarantool.lua 2>./logs/tarantool-stderr.log  >./logs/tarantool-stdout.log &
 sleep 3
