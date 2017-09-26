@@ -19,20 +19,22 @@ type MainPage struct {
 	PerYear         string
 	Calculate       string
 	Language        string
+	Simple          string
+	EthereumYear    string
 }
 
 func mainPage(ctx *fasthttp.RequestCtx, sess *tntsessions.Session) {
 	var mainPage MainPage
-	bytes, err := ioutil.ReadFile("data/resources/" + sess.GetString("language") + "/main.json")
+	bytes, err := ioutil.ReadFile("public/resources/" + sess.GetString("language") + "/main.json")
 	if err != nil {
-		log.Printf("Err reading data/resources/%v/main.json: %v\n", sess.GetString("language"), err)
+		log.Printf("Err reading public/resources/%v/main.json: %v\n", sess.GetString("language"), err)
 		ctx.Response.SetStatusCode(int(InternalServerError))
 		return
 	}
 
 	err = json.Unmarshal(bytes, &mainPage)
 	if err != nil {
-		log.Printf("Err unmarshaling data/resources/%v/main.json: %v\n",
+		log.Printf("Err unmarshaling public/resources/%v/main.json: %v\n",
 			sess.GetString("language"), err)
 		ctx.Response.SetStatusCode(int(InternalServerError))
 		return

@@ -126,13 +126,10 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	case "/ethereum_prediction":
 		// return hashRate / networkHashRate * period / avgBlockTime * reward
 
-		// hashrate := ctx.QueryArgs().GetUfloatOrZero("hashrate")
+		hashrate := ctx.QueryArgs().GetUfloatOrZero("hashrate")
 		profit := make([]float64, len(ethereumCoefficients))
 		for i := 0; i < len(ethereumCoefficients); i++ {
-			profit[i] = ethereumCoefficients[i] / ethereumNetworkMultiplier
-			/*if i > 0 {
-				profit[i] += profit[i-1]
-			}*/
+			profit[i] = 24 * 60 * 60 * hashrate * ethereumReward * ethereumCoefficients[i] / ethereumNetworkMultiplier
 		}
 
 		profitJSON, _ := json.Marshal(profit)

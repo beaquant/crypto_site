@@ -7,7 +7,30 @@
         <link rel="stylesheet" type="text/css" href="/styles/bootstrap/css/bootstrap.min.css">
         <script src="/scripts/jquery-3.2.1.min.js"></script>
         <script src="/styles/bootstrap/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script>
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable([
+                ['Year', 'Sales', 'Expenses'],
+                ['2004',  1000,      400],
+                ['2005',  1170,      460],
+                ['2006',  660,       1120],
+                ['2007',  1030,      540]
+                ]);
+
+                var options = {
+                title: 'Company Performance',
+                curveType: 'function',
+                legend: { position: 'bottom' }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('ether_chart'));
+
+                chart.draw(data, options);
+            }
+
             $(document).ready(function() {
                 
                 $("#calculate").click(function() {
@@ -28,6 +51,15 @@
                         $("td[id=zcash-week]").text(obj.per_week);
                         $("td[id=zcash-month]").text(obj.per_month);
                         $("td[id=zcash-year]").text(obj.per_year);
+                    });
+                });
+
+                $("#calculate-year").click(function() {
+                    $.get("ethereum_prediction", {hashrate: $("#hashrate-ethereum-year").val()}, function(resp) {
+                        obj = $.parseJSON(resp)
+                        for (var i = 0; i < obj.length; i++) {
+                            // alert(obj[i]);
+                        }
                     });
                 });
 
@@ -76,51 +108,82 @@
                     <h4>{{.CalculatorTitle}}</h4>
                 </div>
                 <div class="card-block" style="margin:1%">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Ethereum</th>
-                                <th>ZCash</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">{{.PerDay}}</th>
-                                <td id="ethereum-day">0</td>
-                                <td id="zcash-day">0</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">{{.PerWeek}}</th>
-                                <td id="ethereum-week">0</td>
-                                <td id="zcash-week">0</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">{{.PerMonth}}</th>
-                                <td id="ethereum-month">0</td>
-                                <td id="zcash-month">0</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">{{.PerYear}}</th>
-                                <td id="ethereum-year">0</td>
-                                <td id="zcash-year">0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <form class="form-inline">
-                        <div class="row">
-                            <div class="col-12" >
-                                <input type="text" id="hashrate-ethereum" class="form-control" placeholder="Hashrate ethereum H/s"/>
-                                <input type="text" id="hashrate-zcash" class="form-control" placeholder="Hashrate zcash H/s"/>
-                                <button id="calculate" type="button" class="btn btn-primary">{{.Calculate}}</button>
-                                <div class="dropdown" style="display: inline-block">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Dropdown button
-                                    </button>
+                     <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#home" role="tab">{{.Simple}}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#profile" role="tab">{{.EthereumYear}}</a>
+                    </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="home" role="tabpanel">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ethereum</th>
+                                        <th>ZCash</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">{{.PerDay}}</th>
+                                        <td id="ethereum-day">0</td>
+                                        <td id="zcash-day">0</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">{{.PerWeek}}</th>
+                                        <td id="ethereum-week">0</td>
+                                        <td id="zcash-week">0</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">{{.PerMonth}}</th>
+                                        <td id="ethereum-month">0</td>
+                                        <td id="zcash-month">0</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">{{.PerYear}}</th>
+                                        <td id="ethereum-year">0</td>
+                                        <td id="zcash-year">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <form class="form-inline">
+                                <div class="row">
+                                    <div class="col-12" >
+                                        <input type="text" id="hashrate-ethereum" class="form-control" placeholder="Hashrate ethereum H/s"/>
+                                        <input type="text" id="hashrate-zcash" class="form-control" placeholder="Hashrate zcash H/s"/>
+                                        <button id="calculate" type="button" class="btn btn-primary">{{.Calculate}}</button>
+                                        <div class="dropdown" style="display: inline-block">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Dropdown button
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
-                    </form>
+                        <div class="tab-pane" id="profile" role="tabpanel">
+                            <div id="ether_chart" style="width: 900px; height: 500px"></div>
+                            <form class="form-inline">
+                                <div class="row">
+                                    <div class="col-12" >
+                                        <input type="text" id="hashrate-ethereum-year" class="form-control" placeholder="Hashrate ethereum H/s"/>
+                                        <button id="calculate-year" type="button" class="btn btn-primary">{{.Calculate}}</button>
+                                        <div class="dropdown" style="display: inline-block">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Dropdown button
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
