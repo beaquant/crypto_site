@@ -10,26 +10,10 @@
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script>
             google.charts.load('current', {'packages':['corechart']});
-            google.charts.setOnLoadCallback(drawChart);
-            function drawChart() {
-                var data = google.visualization.arrayToDataTable([
-                ['Year', 'Sales', 'Expenses'],
-                ['2004',  1000,      400],
-                ['2005',  1170,      460],
-                ['2006',  660,       1120],
-                ['2007',  1030,      540]
-                ]);
-
-                var options = {
-                title: 'Company Performance',
-                curveType: 'function',
-                legend: { position: 'bottom' }
-                };
-
-                var chart = new google.visualization.LineChart(document.getElementById('ether_chart'));
-
-                chart.draw(data, options);
-            }
+            // google.charts.setOnLoadCallback(drawChart);
+            // function drawChart() {
+               
+            // }
 
             $(document).ready(function() {
                 
@@ -55,11 +39,32 @@
                 });
 
                 $("#calculate-year").click(function() {
-                    $.get("ethereum_prediction", {hashrate: $("#hashrate-ethereum-year").val()}, function(resp) {
+                    $.get("ethereum_prediction", {
+                       hashrate: $("#hashrate-ethereum-year").val(),
+                        power_consumption: $("#power-consumption-ethereum").val(),
+                        power_cost: $("#power-cost-ethereum").val(),
+                        initial_investment: $("#initial-investment-ethereum").val()
+                    }, function(resp) {
                         obj = $.parseJSON(resp)
+                        
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('number', 'X');
+                        data.addColumn('number', 'Profit');
+
+                        var options = {
+                            curveType: 'function',
+                            legend: { position: 'bottom' }
+                        };
+
+                        var chart = new google.visualization.LineChart(document.getElementById('ether-chart'));
                         for (var i = 0; i < obj.length; i++) {
                             // alert(obj[i]);
+                            var val = parseFloat(obj[i]);
+						    data.addRow([i, val]);
                         }
+
+                        $("#ether-chart").css("display", "");
+                        chart.draw(data, options);
                     });
                 });
 
@@ -102,25 +107,33 @@
                 </div>
             </div>
         </nav>
+
         <div class="container" style="margin-top:3%">
             <div class="card text-center">
                 <div class="card-header">
                     <h4>{{.CalculatorTitle}}</h4>
                 </div>
+
+                <!-- Calculator navigagion -->
                 <div class="card-block" style="margin:1%">
                      <!-- Nav tabs -->
                     <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#home" role="tab">{{.Simple}}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#profile" role="tab">{{.EthereumYear}}</a>
-                    </li>
+                        <!-- Simple calculator tab -->
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#home" role="tab">{{.Simple}}</a>
+                        </li>
+                        <!-- Ethereum neural network calculator -->
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#profile" role="tab">{{.EthereumYear}}</a>
+                        </li>
                     </ul>
 
                     <!-- Tab panes -->
                     <div class="tab-content">
+
+                        <!-- Simple calculator body -->
                         <div class="tab-pane active" id="home" role="tabpanel">
+                            <!-- Table with calculations -->
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -152,11 +165,12 @@
                                     </tr>
                                 </tbody>
                             </table>
+
+                            <!-- Form for simple calculator parametrs -->
                             <form class="form-inline">
                                 <div class="row">
                                     <div class="col-12" >
-                                        <input type="text" id="hashrate-ethereum" class="form-control" placeholder="Hashrate ethereum H/s"/>
-                                        <input type="text" id="hashrate-zcash" class="form-control" placeholder="Hashrate zcash H/s"/>
+                                        <input type="text" id="hashrate" class="form-control" placeholder="Hashrate ethereum H/s"/>
                                         <button id="calculate" type="button" class="btn btn-primary">{{.Calculate}}</button>
                                         <div class="dropdown" style="display: inline-block">
                                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -167,13 +181,29 @@
                                 </div>
                             </form>
                         </div>
+
+                        <!-- Ethereum neural network calculator -->
                         <div class="tab-pane" id="profile" role="tabpanel">
-                            <div id="ether_chart" style="width: 900px; height: 500px"></div>
-                            <form class="form-inline">
+                            <!-- Div for profit chart -->
+                            <div id="ether-chart" style="display: none; height: 60%"></div>
+                            <!-- Form for ethereum neural network calculator parametrs -->
+                            <form class="">
                                 <div class="row">
-                                    <div class="col-12" >
+                                    <div class="offset-lg-3 col-lg-6 form-group" >
+                                        <label class="form-control-label" for="hashrate-ethereum-year">Hashrate:</label>
                                         <input type="text" id="hashrate-ethereum-year" class="form-control" placeholder="Hashrate ethereum H/s"/>
+                                        
+                                        <label class="form-control-label" for="power-consumption-ethereum">{{.PowerConsumption}}:</label>
+                                        <input type="text" id="power-consumption-ethereum" class="form-control" placeholder="{{.PowerConsumption}}"/>
+                                        
+                                        <label class="form-control-label" for="power-cost-ethereum">{{.PowerCost}}:</label>
+                                        <input type="text" id="power-cost-ethereum" class="form-control" placeholder="{{.PowerCost}}"/>
+                                        
+                                        <label class="form-control-label" for="initial-investment-ethereum">{{.InitialInvestment}}:</label>
+                                        <input type="text" id="initial-investment-ethereum" class="form-control" placeholder="{{.InitialInvestment}}"/>
+                                        
                                         <button id="calculate-year" type="button" class="btn btn-primary">{{.Calculate}}</button>
+                                        
                                         <div class="dropdown" style="display: inline-block">
                                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 Dropdown button

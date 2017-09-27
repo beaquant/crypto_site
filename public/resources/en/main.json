@@ -7,5 +7,8 @@
     "PerYear": "Per year",
     "Calculate": "Calculate",
     "Simple": "Simple",
-    "EthereumYear": "Ethereum predictions for year"
+    "EthereumYear": "Ethereum predictions for year",
+    "PowerConsumption": "Power consumption W",
+    "PowerCost": "Power cost KW/h",
+    "InitialInvestment": "Initial investment ($)"
 }

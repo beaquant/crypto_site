@@ -127,9 +127,20 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		// return hashRate / networkHashRate * period / avgBlockTime * reward
 
 		hashrate := ctx.QueryArgs().GetUfloatOrZero("hashrate")
+		powerConsumption := ctx.QueryArgs().GetUfloatOrZero("power_consumption")
+		powerCost := ctx.QueryArgs().GetUfloatOrZero("power_cost")
+		initialInvestment := ctx.QueryArgs().GetUfloatOrZero("initial_investment")
+		log.Println(initialInvestment)
 		profit := make([]float64, len(ethereumCoefficients))
 		for i := 0; i < len(ethereumCoefficients); i++ {
-			profit[i] = 24 * 60 * 60 * hashrate * ethereumReward * ethereumCoefficients[i] / ethereumNetworkMultiplier
+			profit[i] = 24*60*60*hashrate*ethereumReward*
+				ethereumCoefficients[i]/ethereumNetworkMultiplier -
+				powerConsumption*powerCost*24.0/1000.0
+			if i == 0 {
+				profit[i] -= initialInvestment
+			} else if i > 0 {
+				profit[i] += profit[i-1]
+			}
 		}
 
 		profitJSON, _ := json.Marshal(profit)
