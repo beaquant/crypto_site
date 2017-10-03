@@ -49,7 +49,7 @@ testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 wholeX = numpy.reshape(wholeX, (wholeX.shape[0], 1, wholeX.shape[1]))
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
+model.add(LSTM(100, input_shape=(1, look_back)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 model.fit(trainX, trainY, epochs=5, batch_size=1, verbose=2)
@@ -79,23 +79,15 @@ trainPredictPlot[look_back:len(trainPredict)+look_back, :] = trainPredict'''
 testPredictPlot[:, :] = numpy.nan
 testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredict'''
 # shift whole predictions for plotting
-'''wholePredictPlot = numpy.empty_like(dataset)
+wholePredictPlot = numpy.empty_like(dataset)
 wholePredictPlot[:, :] = numpy.nan
 wholePredictPlot[look_back:len(dataset), :] = wholePredict
-'''
+
 # print(testPredict)
 # print('dataset')
 # print(dataset)
 # print(testX)
 
-# plot baseline and predictions
-# plt.plot(scaler.inverse_transform(dataset))
-# plt.plot(trainPredictPlot)
-# plt.plot(testPredictPlot)
-# plt.plot(wholePredictPlot)
-# plt.show()
-
-outset = dataset[:]
 for i in range(0, 364):
 	# print(dataset)
 	input = create_production_dataset(dataset[-look_back:], look_back)
@@ -105,7 +97,12 @@ for i in range(0, 364):
 	# print(prediction)
 	dataset = numpy.concatenate((dataset,  prediction))
 
-
+# plot baseline and predictions
+# plt.plot(scaler.inverse_transform(dataset))
+# plt.plot(trainPredictPlot)
+# plt.plot(testPredictPlot)
+# plt.plot(wholePredictPlot, color="#FF0000")
+# plt.show()
 
 coefs = scaler.inverse_transform(dataset)[-365:, 0]
 f = open("data/coefficients_ethereum.dat" , "w")

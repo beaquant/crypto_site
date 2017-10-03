@@ -85,19 +85,26 @@ func extrapolateEthereumStats() {
 
 	}
 
-	file, err := os.Create("data/ethereum_stats.csv")
+	fileStats, err := os.Create("data/ethereum_stats.csv")
 	if err != nil {
 		log.Println("Err on creating ethereum stats file: ", err)
 		return
 	}
 
+	filePrice, err := os.Create("data/ethereum_price.csv")
+	if err != nil {
+		log.Println("Err on creating ethereum price file: ", err)
+		return
+	}
+
 	for i := 0; i < len(hashrates); i++ {
-		fmt.Fprintf(file, "%d,%.40f\n", dates[i], prices[i]/(avgBlockTime[i]*hashrates[i]))
-		// fmt.Fprintf(file, "%d,%.40f\n", dates[i], 1.0/(avgBlockTime[i]*hashrates[i]))
+		// fmt.Fprintf(file, "%d,%.40f\n", dates[i], prices[i]/(avgBlockTime[i]*hashrates[i]))
+		fmt.Fprintf(fileStats, "%d,%.40f\n", dates[i], 1.0/(avgBlockTime[i]*hashrates[i]))
+		fmt.Fprintf(filePrice, "%d,%.40f\n", dates[i], prices[i])
 		// fmt.Fprintf(file, "%d,%.40f\n", dates[i], hashrates[i])
 	}
 
-	cmd := exec.Command("python3", "lstm_ethereum.py")
+	cmd := exec.Command("python3", "lstm_ethereum_stats.py")
 	err = cmd.Run()
 	if err != nil {
 		log.Println("Err on executing ethereum lstm: ", err)
