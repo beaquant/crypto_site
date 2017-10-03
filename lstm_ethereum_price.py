@@ -28,7 +28,7 @@ def create_production_dataset(dataset, look_back=1):
 # fix random seed for reproducibility
 numpy.random.seed(7)
 # load the dataset
-dataframe = read_csv('data/ethereum_stats.csv', usecols=[1], engine='python')
+dataframe = read_csv('data/ethereum_price.csv', usecols=[1], engine='python')
 dataset = dataframe.values
 dataset = dataset.astype('double')
 # normalize the dataset
@@ -49,10 +49,10 @@ testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 wholeX = numpy.reshape(wholeX, (wholeX.shape[0], 1, wholeX.shape[1]))
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(100, input_shape=(1, look_back)))
+model.add(LSTM(4, input_shape=(1, look_back)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(trainX, trainY, epochs=5, batch_size=1, verbose=2)
+model.fit(wholeX, wholeY, epochs=100, batch_size=1, verbose=2)
 # make predictions
 trainPredict = model.predict(trainX)
 testPredict = model.predict(testX)
@@ -98,11 +98,11 @@ for i in range(0, 364):
 	dataset = numpy.concatenate((dataset,  prediction))
 
 # plot baseline and predictions
-# plt.plot(scaler.inverse_transform(dataset))
+plt.plot(scaler.inverse_transform(dataset))
 # plt.plot(trainPredictPlot)
 # plt.plot(testPredictPlot)
 # plt.plot(wholePredictPlot, color="#FF0000")
-# plt.show()
+plt.show()
 
 coefs = scaler.inverse_transform(dataset)[-365:, 0]
 f = open("data/coefficients_ethereum.dat" , "w")
