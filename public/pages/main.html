@@ -47,24 +47,38 @@
                     }, function(resp) {
                         obj = $.parseJSON(resp)
                         
-                        var data = new google.visualization.DataTable();
-                        data.addColumn('number', 'X');
-                        data.addColumn('number', 'Profit');
+                        var ether_data = new google.visualization.DataTable();
+                        ether_data.addColumn('number', 'X');
+                        ether_data.addColumn('number', 'Profit');
 
                         var options = {
                             curveType: 'function',
                             legend: { position: 'bottom' }
                         };
 
-                        var chart = new google.visualization.LineChart(document.getElementById('ether-chart'));
-                        for (var i = 0; i < obj.length; i++) {
+                        var ether_chart = new google.visualization.LineChart(document.getElementById('ether-chart'));
+                        for (var i = 0; i < obj["ethereum"].length; i++) {
                             // alert(obj[i]);
-                            var val = parseFloat(obj[i]);
-						    data.addRow([i, val]);
+                            var val = parseFloat(obj["ethereum"][i]);
+						    ether_data.addRow([i, val]);
                         }
 
                         $("#ether-chart").css("display", "");
-                        chart.draw(data, options);
+                        ether_chart.draw(ether_data, options);
+
+                        var ether_currency_data = new google.visualization.DataTable();
+                        ether_currency_data.addColumn('number', 'X');
+                        ether_currency_data.addColumn('number', 'Profit');
+
+                        var ether_currency_chart = new google.visualization.LineChart(document.getElementById('ether-currency-chart'));
+                        for (var i = 0; i < obj["ethereum"].length; i++) {
+                            // alert(obj[i]);
+                            var val = parseFloat(obj["currency"][i]);
+						    ether_currency_data.addRow([i, val]);
+                        }
+
+                        $("#ether-currency-chart").css("display", "");
+                        ether_currency_chart.draw(ether_currency_data, options);
                     });
                 });
 
@@ -109,7 +123,7 @@
         </nav>
 
         <div class="container" style="margin-top:3%">
-            <div class="card text-center">
+            <div class="card">
                 <div class="card-header">
                     <h4>{{.CalculatorTitle}}</h4>
                 </div>
@@ -120,19 +134,18 @@
                     <ul class="nav nav-tabs" role="tablist">
                         <!-- Simple calculator tab -->
                         <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#home" role="tab">{{.Simple}}</a>
+                            <a class="nav-link active" data-toggle="tab" href="#simple" role="tab">{{.Simple}}</a>
                         </li>
                         <!-- Ethereum neural network calculator -->
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#profile" role="tab">{{.EthereumYear}}</a>
+                            <a class="nav-link" data-toggle="tab" href="#ethereum" role="tab">{{.EthereumYear}}</a>
                         </li>
                     </ul>
 
                     <!-- Tab panes -->
                     <div class="tab-content">
-
                         <!-- Simple calculator body -->
-                        <div class="tab-pane active" id="home" role="tabpanel">
+                        <div class="tab-pane active" id="simple" role="tabpanel">
                             <!-- Table with calculations -->
                             <table class="table">
                                 <thead>
@@ -183,9 +196,28 @@
                         </div>
 
                         <!-- Ethereum neural network calculator -->
-                        <div class="tab-pane" id="profile" role="tabpanel">
-                            <!-- Div for profit chart -->
-                            <div id="ether-chart" style="display: none; height: 60%"></div>
+                        <div class="tab-pane" id="ethereum" role="tabpanel">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#ethereum-profit" role="tab">Ethereum profit</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#ethereum-profit-currency" role="tab">Ethereum profit in currency</a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="ethereum-profit" role="tabpanel">
+                                    <!-- Div for profit chart -->
+                                    <div id="ether-chart" style="display: none; height: 60%"></div>
+                                </div>
+                                <div class="tab-pane" id="ethereum-profit-currency" role="tabpanel">
+                                    <div id="ether-currency-chart" style="display: none; height: 60%"></div>
+                                </div>
+                            </div>
+                            
                             <!-- Form for ethereum neural network calculator parametrs -->
                             <form class="">
                                 <div class="row">

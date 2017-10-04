@@ -99,7 +99,7 @@ func extrapolateEthereumStats() {
 
 	for i := 0; i < len(hashrates); i++ {
 		// fmt.Fprintf(file, "%d,%.40f\n", dates[i], prices[i]/(avgBlockTime[i]*hashrates[i]))
-		fmt.Fprintf(fileStats, "%d,%.40f\n", dates[i], 1.0/(avgBlockTime[i]*hashrates[i]))
+		fmt.Fprintf(fileStats, "%d,%.40f\n", dates[i], (avgBlockTime[i] * hashrates[i]))
 		fmt.Fprintf(filePrice, "%d,%.40f\n", dates[i], prices[i])
 		// fmt.Fprintf(file, "%d,%.40f\n", dates[i], hashrates[i])
 	}

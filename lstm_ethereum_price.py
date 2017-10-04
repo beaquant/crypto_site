@@ -39,7 +39,7 @@ train_size = int(len(dataset) * 0.67)
 test_size = len(dataset) - train_size
 train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 # reshape into X=t and Y=t+1
-look_back = 10
+look_back = 20
 trainX, trainY = create_dataset(train, look_back)
 testX, testY = create_dataset(test, look_back)
 wholeX, wholeY = create_dataset(dataset, look_back)
@@ -49,7 +49,7 @@ testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 wholeX = numpy.reshape(wholeX, (wholeX.shape[0], 1, wholeX.shape[1]))
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
+model.add(LSTM(4, input_shape=(1, look_back), recurrent_activation='sigmoid'))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 model.fit(wholeX, wholeY, epochs=5, batch_size=1, verbose=2)

@@ -132,19 +132,29 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		powerCost := ctx.QueryArgs().GetUfloatOrZero("power_cost")
 		initialInvestment := ctx.QueryArgs().GetUfloatOrZero("initial_investment")
 		log.Println(initialInvestment)
-		profit := make([]float64, len(ethereumCoefficients))
+		profitEthereum := make([]float64, len(ethereumCoefficients))
+		profitCurrency := make([]float64, len(ethereumPrices))
 		for i := 0; i < len(ethereumCoefficients); i++ {
-			profit[i] = 24*60*60*hashrate*ethereumReward*
-				ethereumCoefficients[i]/ethereumNetworkMultiplier -
+			profitEthereum[i] = 24 * 60 * 60 * hashrate * ethereumReward /
+				ethereumCoefficients[i] / ethereumNetworkMultiplier
+			log.Printf("24*60*60*%f*%f*%f/%f=%f\n", hashrate, ethereumReward, ethereumCoefficients[i],
+				ethereumNetworkMultiplier, profitEthereum[i])
+
+			profitCurrency[i] = profitEthereum[i]*ethereumPrices[i] -
 				powerConsumption*powerCost*24.0/1000.0
 			if i == 0 {
-				profit[i] -= initialInvestment
-			} else if i > 0 {
-				profit[i] += profit[i-1]
+				profitCurrency[i] -= initialInvestment
+			} else {
+				profitEthereum[i] += profitEthereum[i-1]
+				profitCurrency[i] += profitCurrency[i-1]
 			}
+
 		}
 
-		profitJSON, _ := json.Marshal(profit)
+		profitJSON, _ := json.Marshal(map[string]interface{}{
+			"ethereum": profitEthereum,
+			"currency": profitCurrency,
+		})
 		ctx.Response.SetStatusCode(int(Ok))
 		ctx.Write(profitJSON)
 	case "/set_language":

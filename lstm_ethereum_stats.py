@@ -49,27 +49,29 @@ testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 wholeX = numpy.reshape(wholeX, (wholeX.shape[0], 1, wholeX.shape[1]))
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
+model.add(LSTM(4, input_shape=(1, look_back), recurrent_activation='sigmoid'))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(wholeX, wholeY, epochs=5, batch_size=1, verbose=2)
+model.fit(wholeX, wholeY, epochs=20, batch_size=1, verbose=2)
 # make predictions
 trainPredict = model.predict(trainX)
 testPredict = model.predict(testX)
 wholePredict = model.predict(wholeX)
 # invert predictions
-trainPredict = scaler.inverse_transform(trainPredict)
-trainY = scaler.inverse_transform([trainY])
-testPredict = scaler.inverse_transform(testPredict)
-testY = scaler.inverse_transform([testY])
+# trainPredict = scaler.inverse_transform(trainPredict)
+# trainY = scaler.inverse_transform([trainY])
+# testPredict = scaler.inverse_transform(testPredict)
+# testY = scaler.inverse_transform([testY])
 wholePredict = scaler.inverse_transform(wholePredict)
 wholeY = scaler.inverse_transform([wholeY])
+# wholePredict = wholePredict
+# wholeY = [wholeY]
 
 # calculate root mean squared error
-trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
-print('Train Score: %.2f RMSE' % (trainScore))
-testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
-print('Test Score: %.2f RMSE' % (testScore))
+# trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
+# print('Train Score: %.2f RMSE' % (trainScore))
+# testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
+# print('Test Score: %.2f RMSE' % (testScore))
 # shift train predictions for plotting
 '''trainPredictPlot = numpy.empty_like(dataset)
 trainPredictPlot[:, :] = numpy.nan
@@ -79,21 +81,15 @@ trainPredictPlot[look_back:len(trainPredict)+look_back, :] = trainPredict'''
 testPredictPlot[:, :] = numpy.nan
 testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredict'''
 # shift whole predictions for plotting
-'''wholePredictPlot = numpy.empty_like(dataset)
+wholePredictPlot = numpy.empty_like(dataset)
 wholePredictPlot[:, :] = numpy.nan
-wholePredictPlot[look_back:len(dataset), :] = wholePredict'''
+wholePredictPlot[look_back:len(dataset), :] = wholePredict
 
 # print(testPredict)
 # print('dataset')
 # print(dataset)
 # print(testX)
 
-# plot baseline and predictions
-# plt.plot(scaler.inverse_transform(dataset))
-# plt.plot(trainPredictPlot)
-# plt.plot(testPredictPlot)
-# plt.plot(wholePredictPlot, color="#00FF00")
-# plt.show()
 
 for i in range(0, 364):
 	# print(dataset)
@@ -105,10 +101,18 @@ for i in range(0, 364):
 	dataset = numpy.concatenate((dataset,  prediction))
 
 
+# plot baseline and predictions
+# plt.plot(scaler.inverse_transform(dataset))
+# plt.plot(dataset)
+# plt.plot(trainPredictPlot)
+# plt.plot(testPredictPlot)
+# plt.plot(wholePredictPlot, color="#00FF00")
+# plt.show()
 
 
 
 coefs = scaler.inverse_transform(dataset)[-365:, 0]
+# coefs = dataset[-365:, 0]
 f = open("data/coefficients_ethereum.dat" , "w")
 print(dataset[-365:, 0])
 for i in range (0, 365):
