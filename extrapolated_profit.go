@@ -107,7 +107,7 @@ func extrapolateEthereumStats() {
 	cmd := exec.Command("python3", "lstm_ethereum_stats.py")
 	err = cmd.Run()
 	if err != nil {
-		log.Println("Err on executing ethereum lstm: ", err)
+		log.Println("Err on executing ethereum lstm stats: ", err)
 		return
 	}
 
@@ -124,5 +124,26 @@ func extrapolateEthereumStats() {
 		newCoefficients[i], _ = strconv.ParseFloat(arr[i], 64)
 	}
 
+	cmd = exec.Command("python3", "lstm_ethereum_price.py")
+	err = cmd.Run()
+	if err != nil {
+		log.Println("Err on executing ethereum lstm prices: ", err)
+		return
+	}
+
+	bytes, err = ioutil.ReadFile("data/prices_ethereum.dat")
+	if err != nil {
+		log.Println("Err reading ethereum coefficients: ", err)
+		return
+	}
+
+	arr = strings.Split(strings.Trim(string(bytes), "\n"), "\n")
+	log.Println(arr, len(arr))
+	newPrices := make([]float64, len(arr))
+	for i := 0; i < len(arr); i++ {
+		newPrices[i], _ = strconv.ParseFloat(arr[i], 64)
+	}
+
 	ethereumCoefficients = newCoefficients
+	ethereumPrices = newPrices
 }

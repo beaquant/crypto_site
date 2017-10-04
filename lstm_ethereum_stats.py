@@ -28,7 +28,7 @@ def create_production_dataset(dataset, look_back=1):
 # fix random seed for reproducibility
 numpy.random.seed(7)
 # load the dataset
-dataframe = read_csv('data/ethereum_price.csv', usecols=[1], engine='python')
+dataframe = read_csv('data/ethereum_stats.csv', usecols=[1], engine='python')
 dataset = dataframe.values
 dataset = dataset.astype('double')
 # normalize the dataset
@@ -79,14 +79,21 @@ trainPredictPlot[look_back:len(trainPredict)+look_back, :] = trainPredict'''
 testPredictPlot[:, :] = numpy.nan
 testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredict'''
 # shift whole predictions for plotting
-wholePredictPlot = numpy.empty_like(dataset)
+'''wholePredictPlot = numpy.empty_like(dataset)
 wholePredictPlot[:, :] = numpy.nan
-wholePredictPlot[look_back:len(dataset), :] = wholePredict
+wholePredictPlot[look_back:len(dataset), :] = wholePredict'''
 
 # print(testPredict)
 # print('dataset')
 # print(dataset)
 # print(testX)
+
+# plot baseline and predictions
+# plt.plot(scaler.inverse_transform(dataset))
+# plt.plot(trainPredictPlot)
+# plt.plot(testPredictPlot)
+# plt.plot(wholePredictPlot, color="#00FF00")
+# plt.show()
 
 for i in range(0, 364):
 	# print(dataset)
@@ -97,15 +104,12 @@ for i in range(0, 364):
 	# print(prediction)
 	dataset = numpy.concatenate((dataset,  prediction))
 
-# plot baseline and predictions
-# plt.plot(scaler.inverse_transform(dataset))
-# plt.plot(trainPredictPlot)
-# plt.plot(testPredictPlot)
-# plt.plot(wholePredictPlot, color="#FF0000")
-# plt.show()
+
+
+
 
 coefs = scaler.inverse_transform(dataset)[-365:, 0]
-f = open("data/prices_ethereum.dat" , "w")
+f = open("data/coefficients_ethereum.dat" , "w")
 print(dataset[-365:, 0])
 for i in range (0, 365):
 	print(str(coefs[i]))

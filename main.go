@@ -38,6 +38,7 @@ var sessions map[string]*tntsessions.Session
 var commitTime = 5
 var updateProfit = 60
 var ethereumCoefficients []float64
+var ethereumPrices []float64
 
 func updateProfitRoutine() {
 	time.Sleep(time.Duration(updateProfit) * time.Minute)
