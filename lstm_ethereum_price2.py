@@ -13,15 +13,15 @@ from sklearn.metrics import mean_squared_error
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, look_back=1):
 	dataX, dataY = [], []
-	for i in range(len(dataset)-look_back):
+	for i in range(0, len(dataset)-look_back, look_back):
 		a = dataset[i:(i+look_back), 0]
 		dataX.append(a)
-		dataY.append(dataset[i + 1, 0])
+		dataY.append(dataset[i + 1:i+1 + look_back, 0])
 	return numpy.array(dataX), numpy.array(dataY)
 
 def create_production_dataset(dataset, look_back=1):
 	dataX = []
-	for i in range(len(dataset) - look_back + 1):
+	for i in range(0, len(dataset) - look_back + 1, look_back):
 		a = dataset[i:(i+look_back), 0]
 		dataX.append(a)
 	return numpy.array(dataX)
@@ -46,7 +46,7 @@ train_size = int(len(dataset) * 0.67)
 test_size = len(dataset) - train_size
 train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 # reshape into X=t and Y=t+1
-look_back = 3
+look_back = 5
 trainX, trainY = create_dataset(train, look_back)
 testX, testY = create_dataset(test, look_back)
 wholeX, wholeY = create_dataset(dataset, look_back)
@@ -54,34 +54,42 @@ wholeX, wholeY = create_dataset(dataset, look_back)
 trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
 testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 wholeX = numpy.reshape(wholeX, (wholeX.shape[0], 1, wholeX.shape[1]))
+print(wholeX)
 # create and fit the LSTM network
 model = Sequential()
 model.add(LSTM(4, input_shape=(1, look_back), recurrent_activation='sigmoid'))
-model.add(Dense(1))
+model.add(Dense(look_back))
 model.compile(loss='mean_absolute_error', optimizer='adam')
-model.fit(trainX, trainY, epochs=30, batch_size=1, verbose=2)
+model.fit(trainX, trainY, epochs=5, batch_size=1, verbose=2)
 # make predictions
 trainPredict = model.predict(trainX)
 testPredict = model.predict(testX)
 wholePredict = model.predict(wholeX)
 # invert predictions
 trainPredict = scaler.inverse_transform(trainPredict)
-trainY = scaler.inverse_transform([trainY])
-testPredict = scaler.inverse_transform(testPredict)
-testY = scaler.inverse_transform([testY])
-wholePredict = scaler.inverse_transform(wholePredict)
-wholeY = scaler.inverse_transform([wholeY])
+# print(trainY)
+# trainY = scaler.inverse_transform([trainY])
+# testPredict = scaler.inverse_transform(testPredict)
+# testY = scaler.inverse_transform([testY])
+# wholePredict = scaler.inverse_transform(wholePredict)
+wholePredictChart = []
+
+for i in range(0, len(wholePredict)):
+    for j in range(0, look_back):
+        wholePredictChart.append([wholePredict[i][j]])
+wholePredictChart = scaler.inverse_transform(wholePredictChart)
+print(wholePredictChart)
 
 # calculate root mean squared error
-trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
-print('Train Score: %.2f RMSE' % (trainScore))
-testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
-print('Test Score: %.2f RMSE' % (testScore))
+# trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
+# print('Train Score: %.2f RMSE' % (trainScore))
+# testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
+# print('Test Score: %.2f RMSE' % (testScore))
 
 # shift whole predictions for plotting
 wholePredictPlot = numpy.empty_like(dataset)
 wholePredictPlot[:, :] = numpy.nan
-wholePredictPlot[look_back:len(dataset), :] = wholePredict
+wholePredictPlot[look_back:len(dataset), :] = wholePredictChart
 
 # print(testPredict)
 # print('dataset')
@@ -93,7 +101,7 @@ plt.plot(scaler.inverse_transform(dataset))
 # plt.plot(trainPredictPlot)
 # plt.plot(testPredictPlot)
 plt.plot(wholePredictPlot, color="#FF0000")
-plt.show()
+plt.show()    
 
 
 for i in range(0, 365):

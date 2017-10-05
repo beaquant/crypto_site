@@ -20,7 +20,7 @@ df = pd.DataFrame({"ds" : ds_arr, "y": y_arr})
 m = Prophet()
 m.fit(df)
 
-future = m.make_future_dataframe(periods=0)
+future = m.make_future_dataframe(periods=364)
 forecast = m.predict(future)
 # print(forecast[['ds', 'yhat']])
 plt.plot(forecast['yhat'], color="#aa0000")
