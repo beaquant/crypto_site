@@ -1,2 +1,6 @@
 sessions/
 logs/
+arima/target
+crypto_site
+data/
+arima/.vscode
