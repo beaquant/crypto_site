@@ -137,11 +137,12 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		for i := 0; i < len(ethereumCoefficients); i++ {
 			profitEthereum[i] = 24 * 60 * 60 * hashrate * ethereumReward /
 				ethereumCoefficients[i] / ethereumNetworkMultiplier
-			log.Printf("24*60*60*%f*%f*%f/%f=%f\n", hashrate, ethereumReward, ethereumCoefficients[i],
-				ethereumNetworkMultiplier, profitEthereum[i])
+			// log.Printf("24*60*60*%f*%f*%f/%f=%f\n", hashrate, ethereumReward, ethereumCoefficients[i],
+			// ethereumNetworkMultiplier, profitEthereum[i])
 
 			profitCurrency[i] = profitEthereum[i]*ethereumPrices[i] -
 				powerConsumption*powerCost*24.0/1000.0
+			// log.Printf("price=%f", ethereumPrices[i])
 			if i == 0 {
 				profitCurrency[i] -= initialInvestment
 			} else {
@@ -167,7 +168,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 func main() {
 	var err error
 
-	extrapolateEthereumStats()
+	predictEthereumParams()
 	getEthereumStats()
 	getZCashStats()
 	getBitcoinStats()

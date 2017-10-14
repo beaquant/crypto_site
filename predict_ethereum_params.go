@@ -15,7 +15,7 @@ import (
 
 var ethereumNetworkMultiplier = float64(1000000000)
 
-func extrapolateEthereumStats() {
+func predictEthereumParams() {
 	req := fasthttp.AcquireRequest()
 	req.SetRequestURI("https://etherscan.io/chart/blocktime?output=csv")
 	resp := fasthttp.AcquireResponse()
@@ -104,14 +104,15 @@ func extrapolateEthereumStats() {
 		// fmt.Fprintf(file, "%d,%.40f\n", dates[i], hashrates[i])
 	}
 
-	cmd := exec.Command("python3", "lstm_ethereum_stats.py")
+	cmd := exec.Command("java", "-jar",
+		"arima/target/garch-1.0-SNAPSHOT-jar-with-dependencies.jar")
 	err = cmd.Run()
 	if err != nil {
-		log.Println("Err on executing ethereum lstm stats: ", err)
+		log.Println("Err on executing ethereum java-arima: ", err)
 		return
 	}
 
-	bytes, err := ioutil.ReadFile("data/coefficients_ethereum.dat")
+	bytes, err := ioutil.ReadFile("data/stats_predictions.csv")
 	if err != nil {
 		log.Println("Err reading ethereum coefficients: ", err)
 		return
@@ -124,14 +125,7 @@ func extrapolateEthereumStats() {
 		newCoefficients[i], _ = strconv.ParseFloat(arr[i], 64)
 	}
 
-	cmd = exec.Command("python3", "lstm_ethereum_price.py")
-	err = cmd.Run()
-	if err != nil {
-		log.Println("Err on executing ethereum lstm prices: ", err)
-		return
-	}
-
-	bytes, err = ioutil.ReadFile("data/prices_ethereum.dat")
+	bytes, err = ioutil.ReadFile("data/price_predictions.csv")
 	if err != nil {
 		log.Println("Err reading ethereum coefficients: ", err)
 		return

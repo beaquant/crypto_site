@@ -8,89 +8,7 @@
         <script src="/scripts/jquery-3.2.1.min.js"></script>
         <script src="/styles/bootstrap/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script>
-            google.charts.load('current', {'packages':['corechart']});
-            // google.charts.setOnLoadCallback(drawChart);
-            // function drawChart() {
-               
-            // }
 
-            $(document).ready(function() {
-                
-                $("#calculate").click(function() {
-
-                    $("td[id^=ethereum-]").text("0");
-                    $.get("ethereum_profit", {hashrate: $("#hashrate-ethereum").val()}, function(resp) {
-                        obj = $.parseJSON(resp)
-                        $("td[id=ethereum-day]").text(obj.per_day);
-                        $("td[id=ethereum-week]").text(obj.per_week);
-                        $("td[id=ethereum-month]").text(obj.per_month);
-                        $("td[id=ethereum-year]").text(obj.per_year);
-                    });
-
-                    $("td[id^=zcash-]").text("0");
-                    $.get("zcash_profit", {hashrate: $("#hashrate-zcash").val()}, function(resp) {
-                        obj = $.parseJSON(resp)
-                        $("td[id=zcash-day]").text(obj.per_day);
-                        $("td[id=zcash-week]").text(obj.per_week);
-                        $("td[id=zcash-month]").text(obj.per_month);
-                        $("td[id=zcash-year]").text(obj.per_year);
-                    });
-                });
-
-                $("#calculate-year").click(function() {
-                    $.get("ethereum_prediction", {
-                       hashrate: $("#hashrate-ethereum-year").val(),
-                        power_consumption: $("#power-consumption-ethereum").val(),
-                        power_cost: $("#power-cost-ethereum").val(),
-                        initial_investment: $("#initial-investment-ethereum").val()
-                    }, function(resp) {
-                        obj = $.parseJSON(resp)
-                        
-                        var ether_data = new google.visualization.DataTable();
-                        ether_data.addColumn('number', 'X');
-                        ether_data.addColumn('number', 'Profit');
-
-                        var options = {
-                            curveType: 'function',
-                            legend: { position: 'bottom' }
-                        };
-
-                        var ether_chart = new google.visualization.LineChart(document.getElementById('ether-chart'));
-                        for (var i = 0; i < obj["ethereum"].length; i++) {
-                            // alert(obj[i]);
-                            var val = parseFloat(obj["ethereum"][i]);
-						    ether_data.addRow([i, val]);
-                        }
-
-                        $("#ether-chart").css("display", "");
-                        ether_chart.draw(ether_data, options);
-
-                        var ether_currency_data = new google.visualization.DataTable();
-                        ether_currency_data.addColumn('number', 'X');
-                        ether_currency_data.addColumn('number', 'Profit');
-
-                        var ether_currency_chart = new google.visualization.LineChart(document.getElementById('ether-currency-chart'));
-                        for (var i = 0; i < obj["ethereum"].length; i++) {
-                            // alert(obj[i]);
-                            var val = parseFloat(obj["currency"][i]);
-						    ether_currency_data.addRow([i, val]);
-                        }
-
-                        $("#ether-currency-chart").css("display", "");
-                        ether_currency_chart.draw(ether_currency_data, options);
-                    });
-                });
-
-                $('button[data-language]').click(function(event) {
-                    var clicked$ = $(event.target);
-                    var lang = clicked$.attr("data-language");
-                    $.post("/set_language", {language: lang}, function() {
-                        location.reload();
-                    });
-                });
-            });
-        </script>
     </head>
 
     <body>
@@ -115,7 +33,7 @@
                     </li>
                 </ul>
 
-                <div class="btn-group" role="group" aria-label="Basic example">
+                <div class="btn-group" role="group" aria-label="Language switcher">
                     <button type="button" class="btn {{if eq .Language "en"}} btn-primary {{else}} btn-secondary {{end}}" data-language="en">En</button>
                     <button type="button" class="btn {{if eq .Language "ru"}} btn-primary {{else}} btn-secondary {{end}}" data-language="ru">Ru</button>
                 </div>
@@ -130,124 +48,126 @@
 
                 <!-- Calculator navigagion -->
                 <div class="card-block" style="margin:1%">
-                     <!-- Nav tabs -->
+                    <!-- Nav tabs -->
                     <ul class="nav nav-tabs" role="tablist">
-                        <!-- Simple calculator tab -->
-                        <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#simple" role="tab">{{.Simple}}</a>
+                        <li class="nav-item" id="profit-tab">
+                            <a class="nav-link active" data-toggle="tab" href="#profit" role="tab">Ethereum profit</a>
                         </li>
-                        <!-- Ethereum neural network calculator -->
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#ethereum" role="tab">{{.EthereumYear}}</a>
+                        <li class="nav-item" id="profit-currency-tab">
+                            <a class="nav-link" data-toggle="tab" href="#profit-currency" role="tab">Ethereum profit in currency</a>
                         </li>
                     </ul>
 
                     <!-- Tab panes -->
                     <div class="tab-content">
-                        <!-- Simple calculator body -->
-                        <div class="tab-pane active" id="simple" role="tabpanel">
-                            <!-- Table with calculations -->
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Ethereum</th>
-                                        <th>ZCash</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">{{.PerDay}}</th>
-                                        <td id="ethereum-day">0</td>
-                                        <td id="zcash-day">0</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">{{.PerWeek}}</th>
-                                        <td id="ethereum-week">0</td>
-                                        <td id="zcash-week">0</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">{{.PerMonth}}</th>
-                                        <td id="ethereum-month">0</td>
-                                        <td id="zcash-month">0</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">{{.PerYear}}</th>
-                                        <td id="ethereum-year">0</td>
-                                        <td id="zcash-year">0</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <!-- Form for simple calculator parametrs -->
-                            <form class="form-inline">
-                                <div class="row">
-                                    <div class="col-12" >
-                                        <input type="text" id="hashrate" class="form-control" placeholder="Hashrate ethereum H/s"/>
-                                        <button id="calculate" type="button" class="btn btn-primary">{{.Calculate}}</button>
-                                        <div class="dropdown" style="display: inline-block">
-                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Dropdown button
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                        <div class="tab-pane active" id="profit" role="tabpanel">
+                            <!-- Div for profit chart -->
+                            <div id="ether-chart" style="display: none; height: 60%"></div>
                         </div>
-
-                        <!-- Ethereum neural network calculator -->
-                        <div class="tab-pane" id="ethereum" role="tabpanel">
-                            <!-- Nav tabs -->
-                            <ul class="nav nav-tabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-toggle="tab" href="#ethereum-profit" role="tab">Ethereum profit</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#ethereum-profit-currency" role="tab">Ethereum profit in currency</a>
-                                </li>
-                            </ul>
-
-                            <!-- Tab panes -->
-                            <div class="tab-content">
-                                <div class="tab-pane active" id="ethereum-profit" role="tabpanel">
-                                    <!-- Div for profit chart -->
-                                    <div id="ether-chart" style="display: none; height: 60%"></div>
-                                </div>
-                                <div class="tab-pane" id="ethereum-profit-currency" role="tabpanel">
-                                    <div id="ether-currency-chart" style="display: none; height: 60%"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Form for ethereum neural network calculator parametrs -->
-                            <form class="">
-                                <div class="row">
-                                    <div class="offset-lg-3 col-lg-6 form-group" >
-                                        <label class="form-control-label" for="hashrate-ethereum-year">Hashrate:</label>
-                                        <input type="text" id="hashrate-ethereum-year" class="form-control" placeholder="Hashrate ethereum H/s"/>
-                                        
-                                        <label class="form-control-label" for="power-consumption-ethereum">{{.PowerConsumption}}:</label>
-                                        <input type="text" id="power-consumption-ethereum" class="form-control" placeholder="{{.PowerConsumption}}"/>
-                                        
-                                        <label class="form-control-label" for="power-cost-ethereum">{{.PowerCost}}:</label>
-                                        <input type="text" id="power-cost-ethereum" class="form-control" placeholder="{{.PowerCost}}"/>
-                                        
-                                        <label class="form-control-label" for="initial-investment-ethereum">{{.InitialInvestment}}:</label>
-                                        <input type="text" id="initial-investment-ethereum" class="form-control" placeholder="{{.InitialInvestment}}"/>
-                                        
-                                        <button id="calculate-year" type="button" class="btn btn-primary">{{.Calculate}}</button>
-                                        
-                                        <div class="dropdown" style="display: inline-block">
-                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Dropdown button
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                        <div class="tab-pane" id="profit-currency" role="tabpanel">
+                            <div id="ether-currency-chart" style="display: none; height: 60%"></div>
                         </div>
                     </div>
+                    
+                    <!-- Form for ethereum neural network calculator parametrs -->
+                    <form class="">
+                        <div class="row">
+                            <div class="offset-lg-3 col-lg-6 form-group" >
+                                <label class="form-control-label" for="hashrate-ethereum-year">Hashrate:</label>
+                                <input type="text" id="hashrate" class="form-control" placeholder="Hashrate ethereum H/s"/>
+                                
+                                <label class="form-control-label" for="power-consumption-ethereum">{{.PowerConsumption}}:</label>
+                                <input type="text" id="power-consumption" class="form-control" placeholder="{{.PowerConsumption}}"/>
+                                
+                                <label class="form-control-label" for="power-cost-ethereum">{{.PowerCost}}:</label>
+                                <input type="text" id="power-cost" class="form-control" placeholder="{{.PowerCost}}"/>
+                                
+                                <label class="form-control-label" for="initial-investment-ethereum">{{.InitialInvestment}}:</label>
+                                <input type="text" id="initial-investment" class="form-control" placeholder="{{.InitialInvestment}}"/>
+                                
+                                <button id="calculate" type="button" class="btn btn-primary" style="margin-top:2%">{{.Calculate}}</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </body>
+
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+        var ether_data = null;
+        var ether_currency_data = null;
+        var options = {
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+  
+        $(window).resize(function() {
+            if(this.resizeTO) clearTimeout(this.resizeTO);
+            this.resizeTO = setTimeout(function() {
+                $(this).trigger('resizeEnd');
+            }, 0);
+        });
+
+        $(window).on('resizeEnd', function() {
+            draw_charts();
+        });
+
+        $(document).on("shown.bs.tab", "#profit-tab, #profit-currency-tab", function () {
+            draw_charts();
+        });
+
+        function draw_charts() {
+            if (ether_data == null || ether_currency_data == null)
+                return;
+                
+            var ether_chart = new google.visualization.LineChart(document.getElementById('ether-chart'));                
+            $("#ether-chart").css("display", "");
+            ether_chart.draw(ether_data, options);
+
+            var ether_currency_chart = new google.visualization.LineChart(document.getElementById('ether-currency-chart'));                
+            $("#ether-currency-chart").css("display", "");
+            ether_currency_chart.draw(ether_currency_data, options);
+        }
+
+        $("#calculate").click(function() {
+            $.get("ethereum_prediction", {
+                hashrate: $("#hashrate").val(),
+                power_consumption: $("#power-consumption").val(),
+                power_cost: $("#power-cost").val(),
+                initial_investment: $("#initial-investment").val()
+            }, function(resp) {
+                obj = $.parseJSON(resp)
+                
+                ether_data = new google.visualization.DataTable();
+                ether_data.addColumn('number', 'X');
+                ether_data.addColumn('number', 'Profit');
+                for (var i = 0; i < obj["ethereum"].length; i++) {
+                    // alert(obj[i]);
+                    var val = parseFloat(obj["ethereum"][i]);
+                    ether_data.addRow([i, val]);
+                }
+
+                ether_currency_data = new google.visualization.DataTable();
+                ether_currency_data.addColumn('number', 'X');
+                ether_currency_data.addColumn('number', 'Profit');
+                for (var i = 0; i < obj["ethereum"].length; i++) {
+                    // alert(obj[i]);
+                    var val = parseFloat(obj["currency"][i]);
+                    ether_currency_data.addRow([i, val]);
+                }
+
+                draw_charts();
+            });
+        });
+
+        $('button[data-language]').click(function(event) {
+            var clicked$ = $(event.target);
+            var lang = clicked$.attr("data-language");
+            $.post("/set_language", {language: lang}, function() {
+                location.reload();
+            });
+        });
+    </script>
 </html>
