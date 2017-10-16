@@ -1,14 +1,11 @@
 {
     "Title": "Calculator",
     "CalculatorTitle": "Expected profit calculator",
-    "PerDay": "Per day",
-    "PerWeek": "Per week",
-    "PerMonth": "Per month",
-    "PerYear": "Per year",
     "Calculate": "Calculate",
-    "Simple": "Simple",
     "EthereumYear": "Ethereum predictions for year",
     "PowerConsumption": "Power consumption W",
     "PowerCost": "Power cost KW/h",
-    "InitialInvestment": "Initial investment ($)"
+    "InitialInvestment": "Initial investment ($)",
+    "Profit": "Profit",
+    "YourPool": "Your pool"
 }

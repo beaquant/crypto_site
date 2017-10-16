@@ -62,17 +62,30 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="profit" role="tabpanel">
                             <!-- Div for profit chart -->
-                            <div id="ether-chart" style="display: none; height: 60%"></div>
+                            <div id="chart" style="display: none; height: 60%"></div>
                         </div>
                         <div class="tab-pane" id="profit-currency" role="tabpanel">
-                            <div id="ether-currency-chart" style="display: none; height: 60%"></div>
+                            <div id="currency-chart" style="display: none; height: 60%"></div>
                         </div>
                     </div>
                     
                     <!-- Form for ethereum neural network calculator parametrs -->
                     <form class="">
                         <div class="row">
-                            <div class="offset-lg-3 col-lg-6 form-group" >
+                            <div class="offset-lg-2 col-lg-8 form-group" >
+                                <label class="form-control-label" for="hashrate-from-pool">Get hashrate from pool:</label>
+                                <div id="hashrate-from-pool" class="form-inline">
+                                    <div class="dropdown">
+                                        <button id="chosen-pool" data-chosen="" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {{.YourPool}}
+                                        </button>
+                                        <input type="text" id="miner-uri" class="form-control" placeholder="Miner's uri"/>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" data-pool="zcash.flypool.org">zcash.flypool.org</a>
+                                        </div>
+                                    </div>
+                                    <button id="get-pool-hashrate" type="button" class="btn btn-primary" style="margin-left:2%">Get pool hashrate</button>
+                                </div>
                                 <label class="form-control-label" for="hashrate-ethereum-year">Hashrate:</label>
                                 <input type="text" id="hashrate" class="form-control" placeholder="Hashrate ethereum H/s"/>
                                 
@@ -122,12 +135,12 @@
             if (ether_data == null || ether_currency_data == null)
                 return;
                 
-            var ether_chart = new google.visualization.LineChart(document.getElementById('ether-chart'));                
-            $("#ether-chart").css("display", "");
+            var ether_chart = new google.visualization.LineChart(document.getElementById('chart'));                
+            $("#chart").css("display", "");
             ether_chart.draw(ether_data, options);
 
-            var ether_currency_chart = new google.visualization.LineChart(document.getElementById('ether-currency-chart'));                
-            $("#ether-currency-chart").css("display", "");
+            var ether_currency_chart = new google.visualization.LineChart(document.getElementById('currency-chart'));                
+            $("#currency-chart").css("display", "");
             ether_currency_chart.draw(ether_currency_data, options);
         }
 
@@ -142,7 +155,7 @@
                 
                 ether_data = new google.visualization.DataTable();
                 ether_data.addColumn('number', 'X');
-                ether_data.addColumn('number', 'Profit');
+                ether_data.addColumn('number', '{{.Profit}}');
                 for (var i = 0; i < obj["ethereum"].length; i++) {
                     // alert(obj[i]);
                     var val = parseFloat(obj["ethereum"][i]);
@@ -151,7 +164,7 @@
 
                 ether_currency_data = new google.visualization.DataTable();
                 ether_currency_data.addColumn('number', 'X');
-                ether_currency_data.addColumn('number', 'Profit');
+                ether_currency_data.addColumn('number', '{{.Profit}}');
                 for (var i = 0; i < obj["ethereum"].length; i++) {
                     // alert(obj[i]);
                     var val = parseFloat(obj["currency"][i]);
@@ -168,6 +181,29 @@
             $.post("/set_language", {language: lang}, function() {
                 location.reload();
             });
+        });
+
+        $("a[data-pool]").click(function(event) {
+            var clicked$ = $(event.target);
+            var pool = clicked$.attr("data-pool");
+            $("#chosen-pool").text(pool);
+            $("#chosen-pool").attr("data-chosen", pool);
+        });
+
+        $("#get-pool-hashrate").click(function(event) {
+            var clicked$ = $(event.target);
+            var pool = $("#chosen-pool").attr("data-chosen");
+            switch (pool) {
+            case "zcash.flypool.org":
+                // alert($("#miner-uri").val());
+                var miner_uri = $("#miner-uri").val();
+                var get_uri = "https://api-zcash.flypool.org/miner/" + miner_uri + "/history";
+                $.get(get_uri, function(data) {
+                    // obj = $.parseJSON(data);
+                    // alert(obj["status"]);
+                });
+                break;
+            }
         });
     </script>
 </html>

@@ -13,17 +13,14 @@ import (
 type MainPage struct {
 	Title             string
 	CalculatorTitle   string
-	PerDay            string
-	PerWeek           string
-	PerMonth          string
-	PerYear           string
 	Calculate         string
+	Profit            string
 	Language          string
-	Simple            string
 	EthereumYear      string
 	PowerConsumption  string
 	PowerCost         string
 	InitialInvestment string
+	YourPool          string
 }
 
 func mainPage(ctx *fasthttp.RequestCtx, sess *tntsessions.Session) {
