@@ -52,7 +52,7 @@ public class App
                                                             .setSeasonalFrequency(12)
                                                             .build();
             // Arima model = Arima.model(timeSeries, coefficients, fittingStrategy);
-            Arima model = Arima.model(timeSeries, ArimaOrder.order(90, 2, 2), fittingStrategy);
+            Arima model = Arima.model(timeSeries, ArimaOrder.order(2, 2, 2), fittingStrategy);
             // Arima model = Arima.model(timeSeries, ArimaOrder.order(15, 1, 1), fittingStrategy);
             Forecast forecast = ArimaForecast.forecast(model, 364);
             double[] forecast_arr = forecast.forecast().asArray();
@@ -102,7 +102,7 @@ public class App
                                                             .build();
             // Arima model = Arima.model(timeSeries, coefficients, fittingStrategy);
             // Arima model = Arima.model(timeSeries, ArimaOrder.order(90, 2, 2), fittingStrategy);
-            Arima model = Arima.model(timeSeries, ArimaOrder.order(15, 1, 1), fittingStrategy);
+            Arima model = Arima.model(timeSeries, ArimaOrder.order(2, 2, 2), fittingStrategy);
             Forecast forecast = ArimaForecast.forecast(model, 364);
             double[] forecast_arr = forecast.forecast().asArray();
 

@@ -7,5 +7,8 @@
     "PowerCost": "Power cost KW/h",
     "InitialInvestment": "Initial investment ($)",
     "Profit": "Profit",
-    "YourPool": "Your pool"
+    "YourPool": "Your pool",
+    "EthereumProfit": "Ethereum profit",
+    "EthereumProfitInCurrency": "Ethereum profit",
+    "HashrateNotification": "Note, that hashrate for one cryptocurrency won't be same for another"
 }

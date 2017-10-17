@@ -51,10 +51,10 @@
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" id="profit-tab">
-                            <a class="nav-link active" data-toggle="tab" href="#profit" role="tab">Ethereum profit</a>
+                            <a class="nav-link active" data-toggle="tab" href="#profit" role="tab">{{.EthereumProfit}}</a>
                         </li>
                         <li class="nav-item" id="profit-currency-tab">
-                            <a class="nav-link" data-toggle="tab" href="#profit-currency" role="tab">Ethereum profit in currency</a>
+                            <a class="nav-link" data-toggle="tab" href="#profit-currency" role="tab">{{.EthereumProfitInCurrency}}</a>
                         </li>
                     </ul>
 
@@ -81,11 +81,12 @@
                                         </button>
                                         <input type="text" id="miner-uri" class="form-control" placeholder="Miner's uri"/>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" data-pool="zcash.flypool.org">zcash.flypool.org</a>
+                                            <a class="dropdown-item" href="#" data-pool="zcash.flypool.org">zcash.flypool.org (ZEC)</a>
                                         </div>
                                     </div>
                                     <button id="get-pool-hashrate" type="button" class="btn btn-primary" style="margin-left:2%">Get pool hashrate</button>
                                 </div>
+                                <small>{{.HashrateNotification}}</small><br/>
                                 <label class="form-control-label" for="hashrate-ethereum-year">Hashrate:</label>
                                 <input type="text" id="hashrate" class="form-control" placeholder="Hashrate ethereum H/s"/>
                                 
@@ -199,8 +200,11 @@
                 var miner_uri = $("#miner-uri").val();
                 var get_uri = "https://api-zcash.flypool.org/miner/" + miner_uri + "/history";
                 $.get(get_uri, function(data) {
-                    // obj = $.parseJSON(data);
-                    // alert(obj["status"]);
+                    if (data["status"] == "OK") {
+                        var miner_data = data["data"];
+                        var miner_hashrate = miner_data[miner_data.length - 1]["averageHashrate"];
+                        $("#hashrate").val(miner_hashrate);
+                    }
                 });
                 break;
             }

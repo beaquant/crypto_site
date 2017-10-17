@@ -11,16 +11,19 @@ import (
 )
 
 type MainPage struct {
-	Title             string
-	CalculatorTitle   string
-	Calculate         string
-	Profit            string
-	Language          string
-	EthereumYear      string
-	PowerConsumption  string
-	PowerCost         string
-	InitialInvestment string
-	YourPool          string
+	Title                    string
+	CalculatorTitle          string
+	Calculate                string
+	Profit                   string
+	Language                 string
+	EthereumYear             string
+	PowerConsumption         string
+	PowerCost                string
+	InitialInvestment        string
+	YourPool                 string
+	EthereumProfit           string
+	EthereumProfitInCurrency string
+	HashrateNotification     string
 }
 
 func mainPage(ctx *fasthttp.RequestCtx, sess *tntsessions.Session) {
